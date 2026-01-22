@@ -1,11 +1,11 @@
 /* ----------------------------------------------------------------------------
- * Easy!Appointments - Online Appointment Scheduler
+ * Bulma - Online Appointment Scheduler
  *
- * @package     EasyAppointments
+ * @package     Bulma
  * @author      A.Tselegidis <alextselegidis@gmail.com>
  * @copyright   Copyright (c) Alex Tselegidis
  * @license     https://opensource.org/licenses/GPL-3.0 - GPLv3
- * @link        https://easyappointments.org
+ * @link        https://bulma.org
  * @since       v1.5.0
  * ---------------------------------------------------------------------------- */
 
@@ -40,7 +40,7 @@ App.Pages.Installation = (function () {
     });
 
     /**
-     * Event: Install Easy!Appointments Button "Click"
+     * Event: Install Bulma Button "Click"
      */
     $install.on('click', () => {
         if (!validate()) {
@@ -62,7 +62,7 @@ App.Pages.Installation = (function () {
             dataType: 'json',
         }).done(() => {
             $alert
-                .text('Easy!Appointments has been successfully installed!')
+                .text('Bulma has been successfully installed!')
                 .addClass('alert-success')
                 .prop('hidden', false);
 

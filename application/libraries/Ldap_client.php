@@ -1,13 +1,13 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
 
 /* ----------------------------------------------------------------------------
- * Easy!Appointments - Online Appointment Scheduler
+ * Bulma - Online Appointment Scheduler
  *
- * @package     EasyAppointments
+ * @package     Bulma
  * @author      A.Tselegidis <alextselegidis@gmail.com>
  * @copyright   Copyright (c) Alex Tselegidis
  * @license     https://opensource.org/licenses/GPL-3.0 - GPLv3
- * @link        https://easyappointments.org
+ * @link        https://bulma.org
  * @since       v1.5.0
  * ---------------------------------------------------------------------------- */
 
@@ -69,7 +69,7 @@ class Ldap_client
         $user = $this->CI->accounts->get_user_by_username($username);
 
         if (empty($user['ldap_dn'])) {
-            return null; // User does not exist in Easy!Appointments
+            return null; // User does not exist in Bulma
         }
 
         // Connect to LDAP server

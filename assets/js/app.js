@@ -1,10 +1,10 @@
 /* ----------------------------------------------------------------------------
- * Easy!Appointments - Online Appointment Scheduler
+ * Bulma - Online Appointment Scheduler
  *
  * @author      A.Tselegidis <alextselegidis@gmail.com>
  * @copyright   Copyright (c) Alex Tselegidis
  * @license     https://opensource.org/licenses/GPL-3.0 - GPLv3
- * @link        https://easyappointments.org
+ * @link        https://bulma.org
  * @since       v1.5.0
  * ---------------------------------------------------------------------------- */
 

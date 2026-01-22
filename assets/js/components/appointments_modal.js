@@ -1,11 +1,11 @@
 /* ----------------------------------------------------------------------------
- * Easy!Appointments - Online Appointment Scheduler
+ * Bulma - Online Appointment Scheduler
  *
- * @package     EasyAppointments
+ * @package     Bulma
  * @author      A.Tselegidis <alextselegidis@gmail.com>
  * @copyright   Copyright (c) Alex Tselegidis
  * @license     https://opensource.org/licenses/GPL-3.0 - GPLv3
- * @link        https://easyappointments.org
+ * @link        https://bulma.org
  * @since       v1.5.0
  * ---------------------------------------------------------------------------- */
 
@@ -35,10 +35,10 @@ App.Components.AppointmentsModal = (function () {
     const $selectCustomer = $('#select-customer');
     const $saveAppointment = $('#save-appointment');
     const $appointmentId = $('#appointment-id');
-    const $appointmentLocation = $('#appointment-location');
     const $appointmentStatus = $('#appointment-status');
     const $appointmentColor = $('#appointment-color');
     const $appointmentNotes = $('#appointment-notes');
+    const $appointmentRepeats = $('#appointment-repeats');
     const $reloadAppointments = $('#reload-appointments');
     const $selectFilterItem = $('#select-filter-item');
     const $selectService = $('#select-service');
@@ -93,17 +93,28 @@ App.Components.AppointmentsModal = (function () {
             const endDateTimeObject = App.Utils.UI.getDateTimePickerValue($endDatetime);
             const endDatetime = moment(endDateTimeObject).format('YYYY-MM-DD HH:mm:ss');
 
+            let providerId = $selectProvider.val();
+            let parallelId = $('#parallel-provider-id').val();
+            
+            // Si c'est du Jeu Libre (coach masqué)
+            if ($('#coach-selection-wrapper').hasClass('d-none')) {
+                providerId = parallelId; // Le terrain devient le provider principal
+                parallelId = '';         // ON VIDE le champ parallèle pour éviter le doublon
+            }
+
             const appointment = {
                 id_services: $selectService.val(),
-                id_users_provider: $selectProvider.val(),
+                id_users_provider: providerId,
                 start_datetime: startDatetime,
                 end_datetime: endDatetime,
-                location: $appointmentLocation.val(),
                 color: App.Components.ColorSelection.getColor($appointmentColor),
                 status: $appointmentStatus.val(),
                 notes: $appointmentNotes.val(),
                 is_unavailability: Number(false),
+                parallel_provider_id: parallelId,
             };
+
+            console.log("OBJET ENVOYÉ AU PHP :", appointment);
 
             if ($appointmentId.val() !== '') {
                 // Set the id value, only if we are editing an appointment.
@@ -133,6 +144,10 @@ App.Components.AppointmentsModal = (function () {
                 customer.id = $customerId.val();
                 appointment.id_users_customer = customer.id;
             }
+
+            const repeats = $appointmentRepeats.val() || 0;
+            // On peut l'ajouter à l'objet appointment pour qu'il soit transporté
+            appointment.repeats = repeats;
 
             // Define success callback.
             const successCallback = () => {
@@ -166,6 +181,10 @@ App.Components.AppointmentsModal = (function () {
             $('.popover').remove();
 
             App.Components.AppointmentsModal.resetModal();
+
+            // On force encore une fois le reset du terrain ici au cas où
+            $('#parallel-provider-id').val(''); 
+            $('#availability-status').addClass('d-none');
 
             // Set the selected filter item and find the next appointment time as the default modal values.
             if ($selectFilterItem.find('option:selected').attr('type') === 'provider') {
@@ -355,15 +374,28 @@ App.Components.AppointmentsModal = (function () {
          */
         $selectService.on('change', () => {
             const serviceId = $selectService.val();
-
             const providerId = $selectProvider.val();
-
-            $selectProvider.empty();
-
-            // Automatically update the service duration.
+             //   Automatically update the service duration.
             const service = vars('available_services').find((availableService) => {
                 return Number(availableService.id) === Number(serviceId);
             });
+
+            // 2. FILTRE PAR NOM "LIBRE" (Maintenant 'service' existe)
+            const serviceName = service ? service.name.toLowerCase() : '';
+            const $coachWrapper = $('#coach-selection-wrapper');
+            const $coachSelect = $('#select-provider');
+
+            if (serviceName.includes('libre')) {
+                $coachWrapper.addClass('d-none');
+                $coachSelect.removeClass('required').val(''); 
+            } else {
+                $coachWrapper.removeClass('d-none');
+                $coachSelect.addClass('required'); 
+            }
+
+            $selectProvider.empty();
+
+            
 
             if (service?.color) {
                 App.Components.ColorSelection.setColor($appointmentColor, service.color);
@@ -379,6 +411,8 @@ App.Components.AppointmentsModal = (function () {
 
             vars('available_providers').forEach((provider) => {
                 provider.services.forEach((providerServiceId) => {
+                    const email = (provider.email || provider.mail || "").toLowerCase();
+                    if (email.includes('court')) return;
                     if (
                         vars('role_slug') === App.Layouts.Backend.DB_SLUG_PROVIDER &&
                         Number(provider.id) !== vars('user_id')
@@ -432,6 +466,50 @@ App.Components.AppointmentsModal = (function () {
             $customField3.val('');
             $customField4.val('');
             $customField5.val('');
+        });
+
+        /**
+         * Event: Listener to check parallel provider availability
+         */
+        $appointmentsModal.on('change', '#parallel-provider-id', function() {
+            console.log("Changement de terrain détecté..."); // LOG DE TEST
+            
+            const providerId = $(this).val();
+            const $status = $('#availability-status');
+
+            if (!providerId) {
+                $status.addClass('d-none');
+                return;
+            }
+
+            const startValue = App.Utils.UI.getDateTimePickerValue($startDatetime);
+            const endValue = App.Utils.UI.getDateTimePickerValue($endDatetime);
+            
+            const start = moment(startValue).format('YYYY-MM-DD HH:mm:ss');
+            const end = moment(endValue).format('YYYY-MM-DD HH:mm:ss');
+
+            console.log("Vérification pour l'ID: " + providerId + " de " + start + " à " + end);
+
+            $.ajax({
+                url: window.EA_CHECK_AVAILABILITY_URL, // Utilisation de la variable sécurisée
+                data: {
+                    provider_id: providerId,
+                    start_datetime: start,
+                    end_datetime: end
+                },
+                dataType: 'json',
+                success: function(response) {
+                    $status.removeClass('d-none text-success text-danger');
+                    if (response.available) {
+                        $status.html('<i class="fas fa-check-circle"></i> Terrain disponible !').addClass('text-success');
+                    } else {
+                        $status.html('<i class="fas fa-times-circle"></i> Déjà occupé !').addClass('text-danger');
+                    }
+                },
+                error: function(xhr) {
+                    console.error("Erreur 404 - Vérifiez si cette URL fonctionne en direct :", this.url);
+                }
+            });
         });
     }
 
@@ -512,6 +590,11 @@ App.Components.AppointmentsModal = (function () {
         App.Utils.UI.initializeDateTimePicker($endDatetime);
         App.Utils.UI.setDateTimePickerValue($endDatetime, endDatetime);
         $appointmentsModal.find('.modal-message').removeClass('alert-danger').text('').addClass('d-none');
+
+        // Remettre le terrain secondaire à "Aucun"
+        $('#parallel-provider-id').val('').trigger('change');
+        // Cacher la bannière de disponibilité au reset
+        $('#availability-status').addClass('d-none').removeClass('text-success text-danger').html('');
     }
 
     /**

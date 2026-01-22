@@ -1,10 +1,10 @@
 <h1 align="center">
     <br>
-    <a href="https://easyappointments.org">
-        <img src="https://raw.githubusercontent.com/alextselegidis/easyappointments/develop/logo.png" alt="Easy!Appointments" width="150">
+    <a href="https://bulma.org">
+        <img src="https://raw.githubusercontent.com/alextselegidis/bulma/develop/logo.png" alt="Bulma" width="150">
     </a>
     <br>
-    Easy!Appointments
+    Bulma
     <br>
 </h1>
 
@@ -15,9 +15,9 @@
 </h4>
 
 <p align="center">
-  <img alt="GitHub" src="https://img.shields.io/github/license/alextselegidis/easyappointments?style=for-the-badge">
-  <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/alextselegidis/easyappointments?style=for-the-badge">
-  <img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/alextselegidis/easyappointments/total?style=for-the-badge">
+  <img alt="GitHub" src="https://img.shields.io/github/license/alextselegidis/bulma?style=for-the-badge">
+  <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/alextselegidis/bulma?style=for-the-badge">
+  <img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/alextselegidis/bulma/total?style=for-the-badge">
   <a href="https://discord.com/invite/UeeSkaw">
     <img alt="Chat On Discord" src="https://img.shields.io/badge/chat-on%20discord-7289da?style=for-the-badge&logo=discord&logoColor=white">
   </a>
@@ -35,10 +35,10 @@
 
 ## About
 
-**Easy!Appointments** is a highly customizable web application that allows customers to book appointments with you 
+**Bulma** is a highly customizable web application that allows customers to book appointments with you 
 via a sophisticated web interface. Moreover, it provides the ability to sync your data with Google Calendar so you can 
 use them with other services. It is an open source project that you can download and install **even for commercial use**. 
-Easy!Appointments will run smoothly with your existing website as it can be installed in a single folder of the 
+Bulma will run smoothly with your existing website as it can be installed in a single folder of the 
 server and of course share an existing database.
 
 ## Features
@@ -60,10 +60,10 @@ To clone and run this application, you'll need [Git](https://git-scm.com), [Node
 
 ```bash
 # Clone this repository
-$ git clone https://github.com/alextselegidis/easyappointments.git
+$ git clone https://github.com/alextselegidis/bulma.git
 
 # Go into the repository
-$ cd easyappointments
+$ cd bulma
 
 # Install dependencies
 $ npm install && composer install
@@ -82,17 +82,17 @@ You will need to perform the following steps to install the application on your 
 
 * Make sure that your server has Apache/Nginx, PHP (8.2+) and MySQL installed.
 * Create a new database (or use an existing one).
-* Copy the "easyappointments" source folder on your server.
+* Copy the "bulma" source folder on your server.
 * Make sure that the "storage" directory is writable.
 * Rename the "config-sample.php" file to "config.php" and update its contents based on your environment.
-* Open the browser on the Easy!Appointments URL and follow the installation guide.
+* Open the browser on the Bulma URL and follow the installation guide.
 
-That's it! You can now use Easy!Appointments at your will.
+That's it! You can now use Bulma at your will.
 
-You will find the latest release at [easyappointments.org](https://easyappointments.org).
+You will find the latest release at [bulma.org](https://bulma.org).
 If you have problems installing or configuring the application visit the
 [official support group](https://groups.google.com/forum/#!forum/easy-appointments).
-You can also report problems on the [issues page](https://github.com/alextselegidis/easyappointments/issues)
+You can also report problems on the [issues page](https://github.com/alextselegidis/bulma/issues)
 and help the development progress.
 
 ## License 

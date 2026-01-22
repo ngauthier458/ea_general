@@ -1,11 +1,11 @@
 /* ----------------------------------------------------------------------------
- * Easy!Appointments - Online Appointment Scheduler
+ * Bulma - Online Appointment Scheduler
  *
- * @package     EasyAppointments
+ * @package     Bulma
  * @author      A.Tselegidis <alextselegidis@gmail.com>
  * @copyright   Copyright (c) Alex Tselegidis
  * @license     https://opensource.org/licenses/GPL-3.0 - GPLv3
- * @link        https://easyappointments.org
+ * @link        https://bulma.org
  * @since       v1.5.0
  * ---------------------------------------------------------------------------- */
 
@@ -14,6 +14,10 @@
  *
  * This module implements the functionality of the providers page.
  */
+
+    // Rendre la fonction accessible depuis le HTML (onclick)
+
+
 App.Pages.Providers = (function () {
     const $providers = $('#providers');
     const $id = $('#id');
@@ -40,6 +44,8 @@ App.Pages.Providers = (function () {
     let filterResults = {};
     let filterLimit = 20;
     let workingPlanManager;
+
+
 
     /**
      * Add the page event listeners.
@@ -78,11 +84,106 @@ App.Pages.Providers = (function () {
             $filterProviders.find('.selected').removeClass('selected');
             $(event.currentTarget).addClass('selected');
             $('#edit-provider, #delete-provider').prop('disabled', false);
+
+            // On récupère le nom du provider sélectionné pour savoir si c'est un terrain
+            setTimeout(() => {
+                const usernameVal = $('#username').val();
+                const fieldsToHide = [
+                    '#email', '#phone-number', '#mobile-number', '#address', 
+                    '#city', '#state', '#zip-code', '#username', 
+                    '#password', '#password-confirm', '#calendar-view'
+                ];
+
+                // On vérifie si le username commence par "court_"
+                if (usernameVal && usernameVal.indexOf('court_') === 0) {
+                    // INTERFACE TERRAIN
+                    fieldsToHide.forEach(selector => $(selector).closest('.mb-3').hide());
+                    $('label[for="first-name"]').html('Nom du terrain <span class="text-danger">*</span>');
+                    $('label[for="last-name"]').html('Type de surface');
+                } else {
+                    // INTERFACE COACH
+                    fieldsToHide.forEach(selector => $(selector).closest('.mb-3').show());
+                    $('label[for="first-name"]').html('Prénom <span class="text-danger">*</span>');
+                    $('label[for="last-name"]').html('Nom <span class="text-danger">*</span>');
+                }
+            }, 100);
         });
 
         /**
          * Event: Add New Provider Button "Click"
          */
+
+        $providers.on('click', '.add-provider-type', function(e) {
+            e.preventDefault();
+            const type = $(this).data('type');
+
+            // 1. Déclencher l'ajout natif
+            $('#add-provider').trigger('click');
+
+            // 2. Ajuster l'interface après le reset d'EA
+            setTimeout(() => {
+                // Champs à cacher (on a retiré #last-name de la liste pour le garder visible)
+                const fieldsToHide = [
+                    '#email', '#phone-number', '#mobile-number', '#address', 
+                    '#city', '#state', '#zip-code', '#username', 
+                    '#password', '#password-confirm', '#calendar-view'
+                ];
+                const uniqueId = Date.now();
+                const fakePass = 'CourtPass123!';
+
+                $('#email').val('court_' + uniqueId + '@tennis.com');
+                $('#username').val('court_' + uniqueId);
+                $('#password').val(fakePass);
+                $('#password-confirm').val(fakePass);
+                $('#phone-number').val('0000000000'); // Souvent requis par défaut
+
+                if (type === 'court') {
+                    // --- MODE TERRAIN : FOCUS SUR LE COURT ET LA SURFACE ---
+                    
+                    // Cacher les champs inutiles
+                    fieldsToHide.forEach(selector => {
+                        $(selector).closest('.mb-3').hide();
+                    });
+                    $('#notifications').prop('checked', false).trigger('change');
+                    // 3. On force la Langue et le Fuseau Horaire
+                    $('#language').val('french').trigger('change');
+                    $('#timezone').val('Europe/Paris').trigger('change');
+                    // Personnaliser les labels pour le tennis
+                    $('label[for="first-name"]').html('Nom du terrain (ex: Court 1) <span class="text-danger">*</span>');
+                    $('label[for="last-name"]').html('Type de surface (ex: Terre battue) <span class="text-danger">*</span>');
+
+                    // Pré-remplir les données techniques invisibles (backend)
+                    $('#email').val('court_' + Date.now() + '@tennis.com');
+                    $('#username').val('court_' + Math.floor(Math.random() * 10000));
+                    const fakePass = 'Court' + Math.floor(Math.random() * 10000);
+                    $('#password, #password-confirm').val(fakePass);
+
+                    // Focus sur le premier champ
+                    $('#first-name').val('').focus();
+                    $('#last-name').val(''); // On le laisse vide pour que l'utilisateur saisisse la surface
+
+                } else {
+                    // --- MODE COACH : RETOUR À LA NORMALE ---
+                    
+                    fieldsToHide.forEach(selector => {
+                        $(selector).closest('.mb-3').show();
+                    });
+                    
+                    // Remettre les labels originaux (en utilisant les traductions si possible ou texte brut)
+                    $('label[for="first-name"]').html('Prénom <span class="text-danger">*</span>');
+                    $('label[for="last-name"]').html('Nom <span class="text-danger">*</span>');
+                    $('#notifications').prop('checked', false).trigger('change');
+                    // 3. On force la Langue et le Fuseau Horaire
+                    $('#language').val('french').trigger('change');
+                    $('#timezone').val('Europe/Paris').trigger('change');
+                    // Nettoyage complet
+                    $('#first-name, #last-name, #email, #username, #password, #password-confirm').val('');
+                    $('#first-name').focus();
+                }
+            }, 150);
+        });
+
+
         $providers.on('click', '#add-provider', () => {
             App.Pages.Providers.resetForm();
             $filterProviders.find('button').prop('disabled', true);
@@ -506,21 +607,33 @@ App.Pages.Providers = (function () {
      * @return {String} The html code that represents the record on the filter results list.
      */
     function getFilterHtml(provider) {
-        const name = provider.first_name + ' ' + provider.last_name;
+        // Détection du type via le username
+        const isCourt = provider.settings.username && provider.settings.username.indexOf('court_') === 0;
+        
+        // On choisit l'icône : un terrain (tennis ball/table-tennis) ou un coach
+        const icon = isCourt ? 'fa-table-tennis' : 'fa-user-tie';
+        const iconColor = isCourt ? 'text-success' : 'text-primary';
+        
+        // Construction du nom avec l'icône
+        const displayName = `<i class="fas ${icon} ${iconColor} me-2"></i> ${provider.first_name} ${provider.last_name}`;
 
-        let info = provider.email;
-
-        info = provider.mobile_number ? info + ', ' + provider.mobile_number : info;
-
-        info = provider.phone_number ? info + ', ' + provider.phone_number : info;
+        // Pour la ligne d'info (sous le nom)
+        let info = '';
+        if (isCourt) {
+            // Pour un terrain, on affiche "Terrain" au lieu de l'email technique
+            info = 'Ressource : Terrain';
+        } else {
+            // Pour un coach, on garde l'email et les numéros
+            info = provider.email;
+            info = provider.mobile_number ? info + ', ' + provider.mobile_number : info;
+            info = provider.phone_number ? info + ', ' + provider.phone_number : info;
+        }
 
         return $('<div/>', {
             'class': 'provider-row entry',
             'data-id': provider.id,
             'html': [
-                $('<strong/>', {
-                    'text': name,
-                }),
+                $('<strong/>').html(displayName), // .html() pour interpréter la balise <i>
                 $('<br/>'),
                 $('<small/>', {
                     'class': 'text-muted',

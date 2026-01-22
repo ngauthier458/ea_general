@@ -1,7 +1,7 @@
 {
-  "name": "easyappointments",
+  "name": "bulma",
   "description": "Open Source Web Scheduler",
-  "homepage": "https://easyappointments.org",
+  "homepage": "https://bulma.org",
   "author": "A.Tselegidis <alextselegidis@gmail.com>",
   "license": "GPL-3.0",
   "keywords": [
@@ -15,10 +15,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/alextselegidis/easyappointments.git"
+    "url": "git+https://github.com/alextselegidis/bulma.git"
   },
   "bugs": {
-    "url": "https://github.com/alextselegidis/easyappointments/issues"
+    "url": "https://github.com/alextselegidis/bulma/issues"
   },
   "engines": {
     "node": ">=14"

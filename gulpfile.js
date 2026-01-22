@@ -1,11 +1,11 @@
 /* ----------------------------------------------------------------------------
- * Easy!Appointments - Online Appointment Scheduler
+ * Bulma - Online Appointment Scheduler
  *
- * @package     EasyAppointments
+ * @package     Bulma
  * @author      A.Tselegidis <alextselegidis@gmail.com>
  * @copyright   Copyright (c) Alex Tselegidis
  * @license     https://opensource.org/licenses/GPL-3.0 - GPLv3
- * @link        https://easyappointments.org
+ * @link        https://bulma.org
  * @since       v1.4.0
  * ---------------------------------------------------------------------------- */
 
@@ -25,7 +25,7 @@ const zip = require('zip-dir');
 // const debug = require('gulp-debug');
 
 function archive(done) {
-    const filename = 'easyappointments-0.0.0.zip';
+    const filename = 'bulma-0.0.0.zip';
 
     fs.removeSync('build');
     fs.removeSync(filename);

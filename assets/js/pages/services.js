@@ -1,11 +1,11 @@
 /* ----------------------------------------------------------------------------
- * Easy!Appointments - Online Appointment Scheduler
+ * Bulma - Online Appointment Scheduler
  *
- * @package     EasyAppointments
+ * @package     Bulma
  * @author      A.Tselegidis <alextselegidis@gmail.com>
  * @copyright   Copyright (c) Alex Tselegidis
  * @license     https://opensource.org/licenses/GPL-3.0 - GPLv3
- * @link        https://easyappointments.org
+ * @link        https://bulma.org
  * @since       v1.5.0
  * ---------------------------------------------------------------------------- */
 
@@ -29,6 +29,7 @@ App.Pages.Services = (function () {
     const $description = $('#description');
     const $filterServices = $('#filter-services');
     const $color = $('#color');
+    const $weeks = $('#weeks');
     let filterResults = {};
     let filterLimit = 20;
 
@@ -192,7 +193,26 @@ App.Pages.Services = (function () {
 
             App.Utils.Message.show(lang('delete_service'), lang('delete_record_prompt'), buttons);
         });
-    }
+        
+        /**
+         * Event: Sync Weeks Select with Description
+         */
+        $(document).on('change', '#weeks', function() {
+            const selectedWeeks = $(this).val(); // Récupère le tableau des semaines
+            
+            // 1. On récupère la description actuelle, mais on enlève l'ancienne liste de semaines
+            // On utilise un séparateur clair (---) pour ne pas mélanger le texte du coach et les données
+            let currentDesc = $description.val().split('--- Weeks:')[0].trim();
+            
+            if (selectedWeeks && selectedWeeks.length > 0) {
+                const weeksString = selectedWeeks.join(', ');
+                // 2. On concatène la description propre avec les nouvelles semaines
+                $description.val(currentDesc + "\n\n--- Weeks: " + weeksString);
+            } else {
+                $description.val(currentDesc);
+            }
+        });
+}
 
     /**
      * Save service record to database.
@@ -276,8 +296,9 @@ App.Pages.Services = (function () {
         $services.find('.save-cancel-group').hide();
         $('#edit-service, #delete-service').prop('disabled', true);
 
-        $services.find('.record-details .is-invalid').removeClass('is-invalid');
-        $services.find('.record-details .form-message').hide();
+        // --- RESET DES SEMAINES ---
+        $('.week-card').removeClass('active').find('.icon-status').removeClass('fa-check').addClass('fa-plus');
+        $('#weeks-dropdown').hide();
 
         App.Components.ColorSelection.disable($color);
     }
@@ -302,6 +323,21 @@ App.Pages.Services = (function () {
 
         const serviceCategoryId = service.id_service_categories !== null ? service.id_service_categories : '';
         $serviceCategoryId.val(serviceCategoryId);
+
+        // --- LOGIQUE D'EXTRACTION ---
+        const desc = service.description || '';
+        if (desc.includes('--- Weeks:')) {
+            const parts = desc.split('--- Weeks:');
+            const weeksPart = parts[1].trim(); 
+            const weeksArray = weeksPart.split(', ');
+            
+            $weeks.val(weeksArray); 
+        } else {
+            $weeks.val([]); 
+        }
+
+        // Sécurité : On s'assure que le champ est bien rafraîchi visuellement
+        $weeks.trigger('change'); 
     }
 
     /**

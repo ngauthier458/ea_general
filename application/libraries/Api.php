@@ -3,13 +3,13 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 /* ----------------------------------------------------------------------------
- * Easy!Appointments - Online Appointment Scheduler
+ * Bulma - Online Appointment Scheduler
  *
- * @package     EasyAppointments
+ * @package     Bulma
  * @author      A.Tselegidis <alextselegidis@gmail.com>
  * @copyright   Copyright (c) Alex Tselegidis
  * @license     https://opensource.org/licenses/GPL-3.0 - GPLv3
- * @link        https://easyappointments.org
+ * @link        https://bulma.org
  * @since       v1.5.0
  * ---------------------------------------------------------------------------- */
 
@@ -151,7 +151,7 @@ class Api
     #[NoReturn]
     public function request_authentication(): void
     {
-        header('WWW-Authenticate: Basic realm="Easy!Appointments"');
+        header('WWW-Authenticate: Basic realm="Bulma"');
         header('HTTP/1.0 401 Unauthorized');
         exit('You are not authorized to use the API.');
     }
